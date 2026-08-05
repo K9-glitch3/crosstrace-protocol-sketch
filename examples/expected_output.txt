@@ -1,0 +1,4 @@
+VALID_GATE {"permit_issued": true, "reasons": [], "verdict": "ALLOW"}
+FIRST_CONSUME {"reason": null, "verdict": "ALLOW"}
+REPLAYED_CONSUME {"reason": "REPLAY_DETECTED", "verdict": "PAUSE"}
+REVOKED_OVER_LIMIT_GATE {"permit_issued": false, "reasons": ["AUTHORITY_VERSION_STALE", "AUTHORITY_REVOKED", "REVOCATION_STATUS_STALE", "ACTION_OUT_OF_SCOPE"], "verdict": "PAUSE"}

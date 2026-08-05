@@ -1,0 +1,216 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/crosstrace-sketch/handoff-receipt.schema.json",
+  "title": "CrossTrace sketch completed handoff receipt",
+  "description": "Illustrative schema only; it is not a standard or a safety result.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "proposal",
+    "proposal_hash",
+    "sender_attestation",
+    "receiver_attestation"
+  ],
+  "properties": {
+    "proposal": { "$ref": "#/$defs/proposal" },
+    "proposal_hash": { "$ref": "#/$defs/sha256" },
+    "sender_attestation": { "$ref": "#/$defs/senderAttestation" },
+    "receiver_attestation": { "$ref": "#/$defs/receiverAttestation" }
+  },
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "timestamp": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+    },
+    "signature": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{86}$"
+    },
+    "party": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["principal_id", "agent_id", "key_id"],
+      "properties": {
+        "principal_id": { "$ref": "#/$defs/identifier" },
+        "agent_id": { "$ref": "#/$defs/identifier" },
+        "key_id": { "$ref": "#/$defs/identifier" }
+      }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "operations",
+        "resources",
+        "currency",
+        "max_amount_minor",
+        "not_before",
+        "not_after",
+        "redelegations_remaining"
+      ],
+      "properties": {
+        "operations": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/identifier" }
+        },
+        "resources": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/identifier" }
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "max_amount_minor": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "not_before": { "$ref": "#/$defs/timestamp" },
+        "not_after": { "$ref": "#/$defs/timestamp" },
+        "redelegations_remaining": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 32
+        }
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "issuer_principal_id",
+        "subject_principal_id",
+        "subject_key_id",
+        "authority_version",
+        "revocation_status_id"
+      ],
+      "properties": {
+        "issuer_principal_id": { "$ref": "#/$defs/identifier" },
+        "subject_principal_id": { "$ref": "#/$defs/identifier" },
+        "subject_key_id": { "$ref": "#/$defs/identifier" },
+        "authority_version": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "revocation_status_id": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "proposal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "protocol_version",
+        "type",
+        "interaction_id",
+        "event_type",
+        "created_at",
+        "nonce",
+        "sender",
+        "receiver",
+        "sender_sequence",
+        "previous_receipt_id",
+        "scope_profile",
+        "scope",
+        "authority",
+        "request_hash"
+      ],
+      "properties": {
+        "protocol_version": { "const": "crosstrace-sketch/0.1" },
+        "type": { "const": "handoff_proposal" },
+        "interaction_id": { "$ref": "#/$defs/identifier" },
+        "event_type": { "enum": ["delegation", "action_intent"] },
+        "created_at": { "$ref": "#/$defs/timestamp" },
+        "nonce": { "$ref": "#/$defs/identifier" },
+        "sender": { "$ref": "#/$defs/party" },
+        "receiver": { "$ref": "#/$defs/party" },
+        "sender_sequence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "previous_receipt_id": {
+          "oneOf": [
+            { "type": "null" },
+            { "$ref": "#/$defs/sha256" }
+          ]
+        },
+        "scope_profile": { "const": "payment-v1" },
+        "scope": { "$ref": "#/$defs/scope" },
+        "authority": { "$ref": "#/$defs/authority" },
+        "request_hash": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "senderAttestation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["algorithm", "key_id", "proposal_hash", "signature"],
+      "properties": {
+        "algorithm": { "const": "Ed25519" },
+        "key_id": { "$ref": "#/$defs/identifier" },
+        "proposal_hash": { "$ref": "#/$defs/sha256" },
+        "signature": { "$ref": "#/$defs/signature" }
+      }
+    },
+    "receiverAttestation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "algorithm",
+        "key_id",
+        "proposal_hash",
+        "sender_attestation",
+        "decision",
+        "reason_code",
+        "decided_at",
+        "signature"
+      ],
+      "properties": {
+        "algorithm": { "const": "Ed25519" },
+        "key_id": { "$ref": "#/$defs/identifier" },
+        "proposal_hash": { "$ref": "#/$defs/sha256" },
+        "sender_attestation": { "$ref": "#/$defs/senderAttestation" },
+        "decision": { "enum": ["ACCEPT", "REJECT"] },
+        "reason_code": {
+          "oneOf": [
+            { "type": "null" },
+            { "$ref": "#/$defs/identifier" }
+          ]
+        },
+        "decided_at": { "$ref": "#/$defs/timestamp" },
+        "signature": { "$ref": "#/$defs/signature" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "decision": { "const": "ACCEPT" } },
+            "required": ["decision"]
+          },
+          "then": { "properties": { "reason_code": { "type": "null" } } }
+        },
+        {
+          "if": {
+            "properties": { "decision": { "const": "REJECT" } },
+            "required": ["decision"]
+          },
+          "then": { "properties": { "reason_code": { "$ref": "#/$defs/identifier" } } }
+        }
+      ]
+    }
+  }
+}

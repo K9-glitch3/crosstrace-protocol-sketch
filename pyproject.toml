@@ -1,0 +1,43 @@
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "crosstrace-protocol-sketch"
+version = "0.1.0"
+description = "Runnable sketch of two linked, jointly signed handoff receipts and a local payment gate"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [{ name = "Michael Owusu" }]
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+keywords = ["multi-agent systems", "delegation", "auditability", "Ed25519"]
+dependencies = [
+  "cryptography>=44,<50",
+]
+classifiers = [
+  "Development Status :: 2 - Pre-Alpha",
+  "Intended Audience :: Science/Research",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+]
+
+[project.urls]
+Repository = "https://github.com/K9-glitch3/crosstrace-protocol-sketch"
+Issues = "https://github.com/K9-glitch3/crosstrace-protocol-sketch/issues"
+
+[project.optional-dependencies]
+test = [
+  "jsonschema>=4.23,<5",
+  "pytest>=8,<10",
+]
+
+[project.scripts]
+crosstrace-demo = "crosstrace_sketch.demo:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/crosstrace_sketch"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
