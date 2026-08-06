@@ -23,7 +23,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: pip
       - name: Install package and test dependencies
-        run: python -m pip install ".[test]"
+        run: python -m pip install --editable ".[test]"
       - name: Run behaviour tests
         run: python -m pytest
       - name: Run the offline worked example
