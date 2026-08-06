@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/crosstrace/pilot-release-manifest.schema.json",
+  "title": "CrossTrace scripted pilot resolved release manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schema_version",
+    "pilot_id",
+    "title",
+    "claim_level",
+    "conditions",
+    "scenarios",
+    "seeds",
+    "unit",
+    "network_policy",
+    "model_policy",
+    "oracle_policy",
+    "evidence_byte_unit",
+    "statistical_status",
+    "episode_count",
+    "implementation"
+  ],
+  "properties": {
+    "$schema": {"const": "pilot-release-manifest.schema.json"},
+    "schema_version": {"const": 1},
+    "pilot_id": {"const": "crosstrace-scripted-systems-pilot-v0.1"},
+    "title": {"type": "string", "minLength": 1},
+    "claim_level": {"const": "P0_SCRIPTED_CONFORMANCE"},
+    "conditions": {"type": "array", "minItems": 5, "maxItems": 5, "uniqueItems": true, "items": {"type": "string"}},
+    "scenarios": {"type": "array", "minItems": 6, "maxItems": 6, "uniqueItems": true, "items": {"type": "string"}},
+    "seeds": {"type": "array", "minItems": 10, "maxItems": 10, "uniqueItems": true, "items": {"type": "integer", "minimum": 0, "maximum": 9}},
+    "unit": {"type": "string", "minLength": 1},
+    "network_policy": {"const": "no network calls"},
+    "model_policy": {"const": "no model calls"},
+    "oracle_policy": {"type": "string", "minLength": 1},
+    "evidence_byte_unit": {"type": "string", "minLength": 1},
+    "statistical_status": {"type": "string", "minLength": 1},
+    "episode_count": {"const": 300},
+    "implementation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["package", "package_version", "runner", "source_tree_hash"],
+      "properties": {
+        "package": {"const": "crosstrace-protocol-sketch"},
+        "package_version": {"const": "0.1.0"},
+        "runner": {"const": "crosstrace_sketch.pilot.runner"},
+        "source_tree_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+      }
+    }
+  }
+}

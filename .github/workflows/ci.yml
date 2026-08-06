@@ -28,3 +28,8 @@ jobs:
         run: python -m pytest
       - name: Run the offline worked example
         run: python -m crosstrace_sketch.demo
+      - name: Run and verify the credential-free scripted pilot
+        run: |
+          python -m crosstrace_sketch.pilot.runner --output-dir .pilot-ci-result
+          python -m crosstrace_sketch.pilot.verify .pilot-ci-result
+          python -m crosstrace_sketch.pilot.verify pilot/results/pilot-v0.1

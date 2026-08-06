@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/crosstrace/episode-result.schema.json",
+  "title": "CrossTrace scripted pilot episode",
+  "type": "object",
+  "required": [
+    "pilot_id",
+    "episode_id",
+    "case_id",
+    "scenario",
+    "seed",
+    "condition",
+    "oracle_case_hash",
+    "expected_fault",
+    "reconstructed_paths",
+    "exact_path_reconstruction",
+    "unsupported_principal_attributions",
+    "attempts",
+    "detections",
+    "expected_fault_detection_applicable",
+    "expected_fault_detected",
+    "no_fault_false_positive",
+    "evidence_metrics"
+  ],
+  "properties": {
+    "pilot_id": {"const": "crosstrace-scripted-systems-pilot-v0.1"},
+    "episode_id": {"type": "string", "minLength": 1},
+    "case_id": {"type": "string", "minLength": 1},
+    "scenario": {"type": "string", "minLength": 1},
+    "seed": {"type": "integer", "minimum": 0, "maximum": 9},
+    "condition": {"type": "string", "minLength": 1},
+    "oracle_case_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "expected_fault": {"type": ["string", "null"]},
+    "reconstructed_paths": {"type": "array"},
+    "exact_path_reconstruction": {"type": "boolean"},
+    "unsupported_principal_attributions": {"type": "integer", "minimum": 0},
+    "attempts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "attempt_id",
+          "action_id",
+          "authorised",
+          "executed",
+          "unauthorised_execution",
+          "authorised_completion",
+          "false_pause",
+          "unauthorised_attempt_prevented",
+          "decision",
+          "reasons"
+        ],
+        "properties": {
+          "attempt_id": {"type": "string"},
+          "action_id": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+          "authorised": {"type": "boolean"},
+          "executed": {"type": "boolean"},
+          "unauthorised_execution": {"type": "boolean"},
+          "authorised_completion": {"type": "boolean"},
+          "false_pause": {"type": "boolean"},
+          "unauthorised_attempt_prevented": {"type": "boolean"},
+          "decision": {"type": "string"},
+          "reasons": {"type": "array", "items": {"type": "string"}}
+        },
+        "additionalProperties": false
+      }
+    },
+    "detections": {"type": "object", "additionalProperties": {"type": "boolean"}},
+    "expected_fault_detection_applicable": {"type": "boolean"},
+    "expected_fault_detected": {"type": ["boolean", "null"]},
+    "no_fault_false_positive": {"type": "boolean"},
+    "evidence_metrics": {
+      "type": "object",
+      "required": [
+        "canonical_evidence_bytes",
+        "signatures_in_evidence",
+        "records_observed",
+        "model_calls",
+        "input_tokens",
+        "output_tokens",
+        "network_calls"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "canonical_evidence_bytes": {"type": "integer", "minimum": 0},
+        "signatures_in_evidence": {"type": "integer", "minimum": 0},
+        "records_observed": {"type": "integer", "minimum": 0},
+        "model_calls": {"const": 0},
+        "input_tokens": {"const": 0},
+        "output_tokens": {"const": 0},
+        "network_calls": {"const": 0}
+      }
+    }
+  },
+  "additionalProperties": false
+}

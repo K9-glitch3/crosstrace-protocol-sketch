@@ -34,6 +34,8 @@ test = [
 
 [project.scripts]
 crosstrace-demo = "crosstrace_sketch.demo:main"
+crosstrace-pilot = "crosstrace_sketch.pilot.runner:main"
+crosstrace-pilot-verify = "crosstrace_sketch.pilot.verify:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/crosstrace_sketch"]

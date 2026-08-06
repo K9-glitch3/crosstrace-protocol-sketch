@@ -32,6 +32,20 @@ To run the behaviour tests:
 python -m pytest
 ```
 
+To run the deterministic scripted systems pilot and independently recompute its
+summary:
+
+```shell
+python -m crosstrace_sketch.pilot.runner
+python -m crosstrace_sketch.pilot.verify pilot/results/pilot-v0.1
+```
+
+The pilot uses neutral event inputs to encode five evidence conditions across
+six scripted scenarios. Its ten variants per cell are robustness fixtures, not
+independent trials. It makes no model or network calls. See the
+[`pilot` documentation](pilot/README.md) and read its
+[`claims boundary`](pilot/CLAIMS_BOUNDARY.md) before citing the output.
+
 The full deterministic output is in [`examples/expected_output.txt`](examples/expected_output.txt). Permit identifiers are omitted because each run creates them locally.
 
 ## Protocol at a glance
@@ -89,13 +103,17 @@ These boundaries are detailed in [THREAT_MODEL.md](THREAT_MODEL.md). Do not use 
 - `examples/` — the buyer -> broker -> payment-agent trace and expected output.
 - `src/crosstrace_sketch/` — construction, signing, verification, and local permit logic.
 - `tests/` — deterministic acceptance and rejection cases.
+- `pilot/` — scripted conformance design, schemas, verifier, and result release.
 - `docs/PROTOCOL.md` — field meanings, receipt pairing, and decision flow.
 - `THREAT_MODEL.md` — assumptions, security goals, and known limits.
 - `SECURITY.md` — safe-use and private vulnerability-reporting guidance.
 
 ## Research status
 
-This repository specifies and exercises the mechanism. It contains no multi-agent outcome data. Comparative safety, containment, and operational-cost claims require separate experiments against declared baselines.
+This repository specifies and exercises the mechanism. It contains a
+credential-free scripted conformance pilot, but no LLM or frontier-agent outcome
+data. The pilot does not support comparative safety, containment, or
+operational-cost claims; those require a separate preregistered experiment.
 
 ## License
 

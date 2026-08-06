@@ -1,0 +1,29 @@
+{
+  "$schema": "../schemas/pilot-manifest.schema.json",
+  "schema_version": 1,
+  "pilot_id": "crosstrace-scripted-systems-pilot-v0.1",
+  "title": "CrossTrace scripted systems conformance pilot",
+  "claim_level": "P0_SCRIPTED_CONFORMANCE",
+  "conditions": [
+    "ordinary_local_logs",
+    "central_append_only_log",
+    "isolated_signed_logs",
+    "paired_receipts",
+    "paired_receipts_with_gate"
+  ],
+  "scenarios": [
+    "valid_current_within_scope",
+    "withheld_broker_record",
+    "equivocation_joined_views",
+    "revoked_authority",
+    "over_limit",
+    "local_replay"
+  ],
+  "seeds": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+  "unit": "one deterministic condition-scenario-fixture execution",
+  "network_policy": "no network calls",
+  "model_policy": "no model calls",
+  "oracle_policy": "oracle values are available only to the scorer",
+  "evidence_byte_unit": "canonical bytes of all visible retained copies in the joined evidence artifact",
+  "statistical_status": "fixture variants are syntactic robustness checks, not independent trials"
+}
