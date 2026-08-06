@@ -177,7 +177,13 @@ def source_tree_hash(root: Path) -> str:
         root / "THREAT_MODEL.md",
     ]
     digest = hashlib.sha256()
-    for path in sorted({path for path in candidates if path.is_file()}):
+    for path in sorted(
+        {path for path in candidates if path.is_file()},
+        key=lambda candidate: (
+            candidate.relative_to(root).as_posix().casefold(),
+            candidate.relative_to(root).as_posix(),
+        ),
+    ):
         relative = path.relative_to(root).as_posix().encode("utf-8")
         digest.update(len(relative).to_bytes(4, "big"))
         digest.update(relative)
