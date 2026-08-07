@@ -1,0 +1,148 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crosstrace.example/schema/preaward/six-cell-bundle.schema.json",
+  "title": "CrossTrace Sprint 4 representation bundle",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "bundle_id",
+    "case_id",
+    "representation",
+    "neutral_trace_hash",
+    "action_hash",
+    "slot_manifest_hash",
+    "transport_projection_hash",
+    "neutral_handoff_ids",
+    "slot_assignments",
+    "transport_projection",
+    "schedule",
+    "local_observation",
+    "audit_observation",
+    "endpoint_sender_bytes_b64",
+    "pr_copy_pairs_equal"
+  ],
+  "properties": {
+    "version": {"const": "crosstrace-six-cell/0.1"},
+    "bundle_id": {"$ref": "#/$defs/hash"},
+    "case_id": {"$ref": "#/$defs/id"},
+    "representation": {"enum": ["SL", "CR", "PR"]},
+    "neutral_trace_hash": {"$ref": "#/$defs/hash"},
+    "action_hash": {"$ref": "#/$defs/hash"},
+    "slot_manifest_hash": {"$ref": "#/$defs/hash"},
+    "transport_projection_hash": {"$ref": "#/$defs/hash"},
+    "neutral_handoff_ids": {
+      "type": "array",
+      "minItems": 2,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/hash"}
+    },
+    "slot_assignments": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/slot"}
+    },
+    "transport_projection": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/projection"}
+    },
+    "schedule": {"type": "object"},
+    "local_observation": {"type": "object"},
+    "audit_observation": {"type": "object"},
+    "endpoint_sender_bytes_b64": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^[A-Za-z0-9_-]+$"}
+    },
+    "pr_copy_pairs_equal": {"type": ["boolean", "null"]}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"representation": {"const": "PR"}}},
+      "then": {
+        "properties": {
+          "pr_copy_pairs_equal": {"type": "boolean"},
+          "endpoint_sender_bytes_b64": {"maxItems": 0}
+        }
+      },
+      "else": {
+        "properties": {
+          "pr_copy_pairs_equal": {"type": "null"},
+          "endpoint_sender_bytes_b64": {"minItems": 2}
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+    },
+    "hash": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "timestamp": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+    },
+    "slot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "slot_id",
+        "semantic_item_id",
+        "holder_role",
+        "origin_store_id",
+        "destination_kind",
+        "destination_store_id",
+        "sent_at"
+      ],
+      "properties": {
+        "slot_id": {"$ref": "#/$defs/id"},
+        "semantic_item_id": {"$ref": "#/$defs/id"},
+        "holder_role": {"enum": ["SENDER", "RECEIVER", "AUTHORITY"]},
+        "origin_store_id": {"$ref": "#/$defs/id"},
+        "destination_kind": {"enum": ["LOCAL", "AUDIT"]},
+        "destination_store_id": {"$ref": "#/$defs/id"},
+        "sent_at": {"$ref": "#/$defs/timestamp"}
+      }
+    },
+    "projection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "delivery_slot_id",
+        "copy_index",
+        "origin_store_id",
+        "destination_store_id",
+        "sent_at",
+        "disposition",
+        "delivered_at",
+        "fault_tags"
+      ],
+      "properties": {
+        "delivery_slot_id": {"$ref": "#/$defs/id"},
+        "copy_index": {"type": "integer", "minimum": 0},
+        "origin_store_id": {"$ref": "#/$defs/id"},
+        "destination_store_id": {"$ref": "#/$defs/id"},
+        "sent_at": {"$ref": "#/$defs/timestamp"},
+        "disposition": {"enum": ["DELIVER", "LOST", "WITHHELD"]},
+        "delivered_at": {
+          "oneOf": [
+            {"$ref": "#/$defs/timestamp"},
+            {"type": "null"}
+          ]
+        },
+        "fault_tags": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/id"}
+        }
+      }
+    }
+  }
+}

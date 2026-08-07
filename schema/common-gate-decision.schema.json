@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/crosstrace-sketch/common-gate-decision.schema.json",
+  "title": "CrossTrace representation-neutral common gate decision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "decision_id",
+    "verdict",
+    "reasons",
+    "action_id",
+    "leaf_neutral_handoff_id",
+    "neutral_chain_id",
+    "controlling_status_id",
+    "replay_scope_id",
+    "permit_id",
+    "permit_expires_at"
+  ],
+  "properties": {
+    "version": { "const": "crosstrace-common-gate-decision/0.1" },
+    "decision_id": { "$ref": "#/$defs/sha256" },
+    "verdict": { "enum": ["ALLOW", "PAUSE"] },
+    "reasons": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/identifier" }
+    },
+    "action_id": { "$ref": "#/$defs/sha256" },
+    "leaf_neutral_handoff_id": { "$ref": "#/$defs/nullableSha256" },
+    "neutral_chain_id": { "$ref": "#/$defs/nullableSha256" },
+    "controlling_status_id": { "$ref": "#/$defs/nullableSha256" },
+    "replay_scope_id": { "$ref": "#/$defs/nullableSha256" },
+    "permit_id": {
+      "oneOf": [
+        { "type": "null" },
+        { "$ref": "#/$defs/identifier" }
+      ]
+    },
+    "permit_expires_at": {
+      "oneOf": [
+        { "type": "null" },
+        { "$ref": "#/$defs/timestamp" }
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "verdict": { "const": "ALLOW" } },
+        "required": ["verdict"]
+      },
+      "then": {
+        "properties": {
+          "reasons": { "maxItems": 0 },
+          "leaf_neutral_handoff_id": { "$ref": "#/$defs/sha256" },
+          "neutral_chain_id": { "$ref": "#/$defs/sha256" },
+          "controlling_status_id": { "$ref": "#/$defs/sha256" },
+          "replay_scope_id": { "$ref": "#/$defs/sha256" },
+          "permit_id": { "$ref": "#/$defs/identifier" },
+          "permit_expires_at": { "$ref": "#/$defs/timestamp" }
+        }
+      },
+      "else": {
+        "properties": {
+          "reasons": { "minItems": 1 },
+          "permit_id": { "type": "null" },
+          "permit_expires_at": { "type": "null" }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "nullableSha256": {
+      "oneOf": [
+        { "type": "null" },
+        { "$ref": "#/$defs/sha256" }
+      ]
+    },
+    "timestamp": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+    }
+  }
+}

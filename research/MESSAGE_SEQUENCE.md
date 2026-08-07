@@ -106,7 +106,7 @@ At the payment decision time, the verifier asks:
 9. Are receipt and scope timestamps consistent under the declared clock-skew bound?
 10. Does the leaf request hash match the exact proposed action?
 11. Is that action within every scope?
-12. Has this local store already observed a conflicting receipt or the same action nonce?
+12. Has this local store already observed a conflicting neutral handoff or the same action nonce?
 
 Only if every applicable answer is yes does the verifier reserve a local permit.
 
@@ -153,7 +153,7 @@ This case is essential. CrossTrace cannot act on evidence it has not received. T
 | `PR-AUDIT` | Sender and receiver keep the dual-attested receipt | The presented action is submitted to the adapter without a gate; evidence is examined later. |
 | `PR-GATE` | The same dual-attested receipt | The local gate decides from the delivered receipt view. |
 
-In an inferential study, each episode is independently reset and assigned to one cell. Cells share the same episode generator, scenario definitions, block variables, and delivery rules—not one realised frontier-agent action trace. A gate is never given a separate truth-derived chain. Development-only replay fixtures may encode one fixed trace in all four cells, but those fixtures are not statistical trials.
+In an inferential study, each episode is independently reset and assigned to one cell. Cells share the same episode generator, scenario definitions, block variables, and delivery rules—not one realised frontier-agent action trace. A gate is never given a separate truth-derived chain. The Sprint 4 development harness may encode one fixed synthetic trace across all six audit-and-gate cells, but those 48 branch executions are engineering fixtures, not statistical trials or safety results.
 
 ## What signatures do not prove
 

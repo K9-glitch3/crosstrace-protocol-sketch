@@ -9,7 +9,7 @@
 
 ## 1. Purpose and status
 
-This document specifies the proposed analysis architecture before the observation layer or frontier-agent study exists. It does not change either submitted funding application and does not authorise outcome-generating work.
+This document specifies the proposed analysis architecture before any frontier-agent study exists. Development-only observation, validation, gate, and integration packages now exist outside the frozen P0 source tree; they do not change either submitted funding application and do not authorise outcome-generating work.
 
 The P0 artifact at commit `824078b876f23d4d138a9dd2fff3a6c1ff6d5c80` is a deterministic conformance artifact. Its fixture executions will not enter a power calculation, effect estimate, confidence interval, model-selection decision, or confirmatory dataset. This draft does not claim that its authors were blinded to those outputs.
 
@@ -67,7 +67,7 @@ The action-boundary replay study in Section 6 uses a different unit: one frozen 
 
 In the end-to-end study, each independently reset episode is assigned to one cell. Cells share a preregistered generator, target distribution, block variables, and delivery rules—not one realised conversation or action trace. Both gate cells derive their inputs solely from the assigned episode's decision-time local observation.
 
-Development-only replays may encode one fixed trace under all four cells to test conformance. They are not independent observations and do not enter inference.
+The Sprint 4 development replay may encode one fixed synthetic trace under all six primary and required-control cells to test conformance. Those branch executions are not independent observations and do not enter inference.
 
 Two cross-referenced-log cells are required competent-baseline controls:
 
@@ -370,6 +370,10 @@ On 7 August 2026, the deterministic delivery and local-observation portion enter
 
 On the same date, the separate `preaward/crosstrace_sprint2` package fixed the exact `SL` and `CR` schemas, the fair-profile `PR` mapping and validator over the existing P0 receipt schema, representation-specific validators, and common `ValidatedHandoff` evidence interface. Its adversarial fixtures are also permanently excluded from calibration and confirmation. Authority selection, full same-policy gating, outcome generation, and inference remain outside that package.
 
+The `preaward/crosstrace_sprint3` package adds a representation-blind common gate over validator-issued policy views. It applies delivered-authority selection, chain, scope, and exact-action checks, and revision-checked neutral replay and one-attempt permit state. Its synthetic integration checks passed. This is a development implementation, not a registered policy or evidence of an effect.
+
+The `preaward/crosstrace_sprint4` package fixes eight hand-written cases across the six `SL`, `CR`, and `PR` audit-and-gate cells. Its published release contains 48 deterministic branch executions and passed schema checks, deterministic regeneration, the integrated tests, and the frozen P0 verifier. Those executions measure only engineering conformance, such as delivered inputs, validator branches, gate reasons, permit transitions, and adapter state. They are not independent trials, pilot observations, effect estimates, safety outcomes, or held-out material.
+
 ### Stage 2: excluded calibration pilot
 
 Only after funding and protocol review, run the approved number of frontier-agent calibration episodes to estimate scenario difficulty, scorer agreement, costs, and nuisance parameters. The Schmidt submission and the internal LTFF full-tier plan use approximately 120 as a planning figure; the signed agreement and final power plan control. Treatment-effect results from this pilot are not confirmatory results.
@@ -532,4 +536,4 @@ No document is called a preregistration until it has an independent timestamp cr
 
 Safe pre-award work is limited to definitions, schemas, deterministic delivery infrastructure, dummy-data analysis tests, development-only fixtures, review preparation, and release/accounting controls.
 
-Frontier-model experiments, the excluded pilot, confirmatory episodes, held-out material, outcome-driven tuning, paid replication, and Phase II execution remain frozen until the relevant funding and protocol approvals exist.
+The next step is external methods review, followed by resolution of review comments and a frozen protocol and preregistration under the applicable award and approvals. Frontier-model experiments, the excluded pilot, confirmatory episodes, held-out material, outcome-driven tuning, paid replication, and Phase II execution remain frozen. No additional pre-award model run is authorised by completion of the development harness.

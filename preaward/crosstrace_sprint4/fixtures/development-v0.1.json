@@ -1,0 +1,79 @@
+{
+  "version": "crosstrace-six-cell-fixtures/0.1",
+  "fixture_set_id": "crosstrace-six-cell-development-v0.1",
+  "classification": "DEVELOPMENT_ONLY",
+  "cases": [
+    {
+      "case_id": "complete",
+      "opaque_trace_id": "devtrace-01",
+      "delivery_mode": "COMPLETE",
+      "authority_mode": "ACTIVE_ONLY",
+      "action_mode": "IN_SCOPE",
+      "attempt_count": 1,
+      "conflicting_leaf": false
+    },
+    {
+      "case_id": "one-leaf-receiver-locally-withheld",
+      "opaque_trace_id": "devtrace-02",
+      "delivery_mode": "WITHHOLD_LEAF_RECEIVER_LOCAL",
+      "authority_mode": "ACTIVE_ONLY",
+      "action_mode": "IN_SCOPE",
+      "attempt_count": 1,
+      "conflicting_leaf": false
+    },
+    {
+      "case_id": "both-leaf-copies-locally-withheld",
+      "opaque_trace_id": "devtrace-03",
+      "delivery_mode": "WITHHOLD_BOTH_LEAF_LOCAL",
+      "authority_mode": "ACTIVE_ONLY",
+      "action_mode": "IN_SCOPE",
+      "attempt_count": 1,
+      "conflicting_leaf": false
+    },
+    {
+      "case_id": "status-delayed-locally-audit-visible",
+      "opaque_trace_id": "devtrace-04",
+      "delivery_mode": "DELAY_ACTIVE_STATUS_LOCAL",
+      "authority_mode": "ACTIVE_ONLY",
+      "action_mode": "IN_SCOPE",
+      "attempt_count": 1,
+      "conflicting_leaf": false
+    },
+    {
+      "case_id": "higher-revocation",
+      "opaque_trace_id": "devtrace-05",
+      "delivery_mode": "COMPLETE",
+      "authority_mode": "ACTIVE_AND_HIGHER_REVOKED",
+      "action_mode": "IN_SCOPE",
+      "attempt_count": 1,
+      "conflicting_leaf": false
+    },
+    {
+      "case_id": "out-of-scope",
+      "opaque_trace_id": "devtrace-06",
+      "delivery_mode": "COMPLETE",
+      "authority_mode": "ACTIVE_ONLY",
+      "action_mode": "OUT_OF_SCOPE",
+      "attempt_count": 1,
+      "conflicting_leaf": false
+    },
+    {
+      "case_id": "replay",
+      "opaque_trace_id": "devtrace-07",
+      "delivery_mode": "COMPLETE",
+      "authority_mode": "ACTIVE_ONLY",
+      "action_mode": "IN_SCOPE",
+      "attempt_count": 2,
+      "conflicting_leaf": false
+    },
+    {
+      "case_id": "authenticated-conflicting-leaf",
+      "opaque_trace_id": "devtrace-08",
+      "delivery_mode": "COMPLETE",
+      "authority_mode": "ACTIVE_ONLY",
+      "action_mode": "IN_SCOPE",
+      "attempt_count": 1,
+      "conflicting_leaf": true
+    }
+  ]
+}

@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crosstrace.example/schema/preaward/six-cell-manifest.schema.json",
+  "title": "CrossTrace Sprint 4 resolved manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "release_id",
+    "claim_level",
+    "classification",
+    "cells",
+    "fixture_count",
+    "bundle_count",
+    "execution_count",
+    "unit",
+    "fixture_hash",
+    "source_tree_hash",
+    "source_files",
+    "deterministic_files",
+    "policies"
+  ],
+  "properties": {
+    "version": {"const": "crosstrace-six-cell/0.1"},
+    "release_id": {"const": "crosstrace-six-cell-development-v0.1"},
+    "claim_level": {"const": "PREAWARD_DEVELOPMENT_CONFORMANCE"},
+    "classification": {"const": "DEVELOPMENT_ONLY"},
+    "cells": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/cell"}
+    },
+    "fixture_count": {"const": 8},
+    "bundle_count": {"const": 24},
+    "execution_count": {"const": 48},
+    "unit": {"const": "one synthetic fixture encoding and enforcement branch"},
+    "fixture_hash": {"$ref": "#/$defs/hash"},
+    "source_tree_hash": {"$ref": "#/$defs/hash"},
+    "source_files": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/source"}
+    },
+    "deterministic_files": {
+      "type": "array",
+      "prefixItems": [
+        {"const": "fixtures.resolved.json"},
+        {"const": "manifest.resolved.json"},
+        {"const": "bundles.jsonl"},
+        {"const": "executions.jsonl"},
+        {"const": "invariance.json"},
+        {"const": "summary.json"},
+        {"const": "REPORT.md"}
+      ],
+      "items": false,
+      "minItems": 7
+    },
+    "policies": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "engineering_only",
+        "independent_trials",
+        "model_calls",
+        "runtime_network_calls",
+        "synthetic_adapter"
+      ],
+      "properties": {
+        "engineering_only": {"const": true},
+        "independent_trials": {"const": false},
+        "model_calls": {"const": 0},
+        "runtime_network_calls": {"const": 0},
+        "synthetic_adapter": {"const": true}
+      }
+    }
+  },
+  "$defs": {
+    "hash": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "cell": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cell_id", "representation", "enforcement"],
+      "properties": {
+        "cell_id": {
+          "enum": [
+            "SL-AUDIT",
+            "SL-GATE",
+            "CR-AUDIT",
+            "CR-GATE",
+            "PR-AUDIT",
+            "PR-GATE"
+          ]
+        },
+        "representation": {"enum": ["SL", "CR", "PR"]},
+        "enforcement": {"enum": ["AUDIT", "GATE"]}
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    }
+  }
+}

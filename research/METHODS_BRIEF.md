@@ -55,7 +55,11 @@ For the primary audit-only representation comparison, agents see the same neutra
 
 The development-only Sprint 1 package implements a deterministic delivery layer. Before representation encoding, the manifest assigns each holder-to-store transmission a neutral delivery slot. Transport draws are derived from that slot, copy index, draw purpose, and seed, so changing payload bytes or representation does not change the assigned loss, duplication, or delay. Each retained copy or status is a separate message that may be delayed, lost, duplicated, reordered, or partitioned. At time `t`, a verifier sees only messages delivered by `t`; it never sees missing-message identifiers, future deliveries, another principal's private view, or the evaluator's schedule. For reconstruction, the evaluator uses a separate condition-neutral inbox containing only holder messages delivered through the same frozen delivery model by the preregistered audit cutoff. Exact representation validators, not the generic transport envelope, are responsible for excluding semantic oracle data from payloads.
 
-The development-only Sprint 2 package implements those exact `SL`, cross-referenced `CR`, and fair-profile `PR` validators plus a common representation-blind policy projection. Missing or conflicting evidence remains a validation issue rather than being silently completed or selected. These conformance fixtures are not outcome data, and the full common authority, scope, action, replay, and permit gate remains prospective.
+The development-only Sprint 2 package implements those exact `SL`, cross-referenced `CR`, and fair-profile `PR` validators plus a common representation-blind policy projection. Missing or conflicting evidence remains a validation issue rather than being silently completed or selected.
+
+The development-only Sprint 3 package adds the next boundary: a verifier and store registry, strict selection among authority statuses delivered by the decision time, a common chain, scope, and action policy, and revision-checked neutral permit state. The common gate receives validator-issued policy views, not receipt-only fields or a truth-derived chain. A permit is keyed to the neutral handoff chain, exact action, tool, and local nonce; the adapter marks it attempted before acting and does not retry an attempted permit automatically. The package passed its integrated development checks; it remains outside the frozen P0 source tree and is not a production authorisation system.
+
+Sprint 4 is a deterministic integration harness, not a pilot. It runs eight hand-written cases through `SL-AUDIT`, `SL-GATE`, `CR-AUDIT`, `CR-GATE`, `PR-AUDIT`, and `PR-GATE`. The published 48 branch executions exercise delivery, validation, authority selection, scope checks, replay handling, and adapter state. They passed the release verifier and integrated test suite. They are engineering conformance records only and contain no model calls, frontier-agent episodes, held-out cases, comparative estimates, or safety outcomes.
 
 The study will report two reconstruction effects:
 
@@ -114,7 +118,7 @@ The primary benchmark assumes uncompromised keys for honest parties, at least on
 
 Two isolated verifiers may each receive a locally valid-looking branch and both permit action. Later evidence can reveal that conflict, but later detection is not prevention.
 
-## Immediate engineering work
+## Pre-award engineering boundary and next step
 
 Before any frontier-model run, the project will implement and test with development-only fixtures:
 
@@ -125,6 +129,6 @@ Before any frontier-model run, the project will implement and test with developm
 5. separate action-state and cost instrumentation; and
 6. a frozen reconstruction procedure and held-out policy.
 
-As of 7 August 2026, items 1–3 have development-only implementations and adversarial conformance tests outside the frozen P0 source tree. The common interface currently stops at evidence admission; items 4–6 remain prospective. This work has generated no model-study observations and is not evidence of a safety effect.
+As of 7 August 2026, the development packages cover items 1–4 outside the frozen P0 source tree. Sprint 4 integrates those mechanics across the six required engineering cells and eight synthetic cases; deterministic regeneration, the integrated tests, and the frozen P0 verifier passed. Item 5 is only partially scaffolded: the harness records adapter state and delivered message and byte counts, but decision latency and study-stage token, API, compute, and storage costs remain to be implemented. Item 6 remains a protocol-review and preregistration task; no held-out material has been created.
 
-Frontier-model experiments, confirmatory episodes, held-out cases, paid replication, and Phase II work remain frozen until the relevant funding and protocol approvals exist.
+The next work is external methods review, resolution of review comments, and a frozen protocol and preregistration under the applicable award and approvals. Frontier-model experiments, calibration, confirmatory episodes, held-out cases, paid replication, and Phase II work remain frozen. The development fixtures have generated no model-study observations and are not evidence of a safety or comparative effect.

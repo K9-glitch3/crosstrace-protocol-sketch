@@ -17,4 +17,8 @@ The development-only [Sprint 1 delivery package](../preaward/crosstrace_sprint1/
 
 The development-only [Sprint 2 evidence package](../preaward/crosstrace_sprint2/README.md) now fixes the exact separate-log, cross-referenced-log, and receipt mappings, their representation-specific validators, and the common `ValidatedHandoff` interface. It also supplies adversarial conformance fixtures; it does not contain research outcomes.
 
-The next implementation step is a new versioned common gate boundary: authority-status selection, scope/action checks, and permit replay identity must consume the neutral handoff rather than P0's receipt-specific permit field. Frontier-model, calibration, and held-out material remain out of scope until protocol review and registration.
+The development-only Sprint 3 package adds a versioned, representation-blind common gate boundary. It selects from authority-status evidence delivered by the decision time, checks chain, scope, and action predicates, and uses neutral handoff identity for revision-checked local replay and permit state. It is not promoted into the frozen P0 package.
+
+The [Sprint 4 six-cell harness](../preaward/crosstrace_sprint4/README.md) replays eight hand-written cases through `SL`, `CR`, and `PR`, each in audit-only and gate modes. Its [published result](../preaward/results/six-cell-v0.1/REPORT.md) contains 48 deterministic branch executions and passed deterministic regeneration, the integrated tests, and the frozen P0 verifier. These are engineering conformance fixtures, not independent trials or research outcomes.
+
+The next step is external methods review, then a frozen protocol and preregistration under the applicable funding and approvals. Frontier-model runs, calibration, outcome-generating experiments, and held-out material remain out of scope before that boundary.

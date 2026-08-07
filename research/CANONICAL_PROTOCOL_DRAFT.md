@@ -55,19 +55,21 @@ CrossTrace is evaluated at one instrumented action boundary. It does not stop an
 
 ### 5.0 Implementation status
 
-| Component | Status at the P0 baseline |
+| Component | Current status; P0 remains frozen |
 |---|---|
 | Parties, structured payment scope, action identity, authority reference | Implemented |
 | Dual-attested receipts and variable-length receipt verification | Implemented |
 | Signed authority status and local key roles | Implemented |
-| Selection among multiple delivered authority statuses | Prospective; P0 accepts one supplied status |
+| Selection among multiple delivered authority statuses | Development-only Sprint 3 implementation verified in synthetic fixtures; P0 still accepts one supplied status |
 | Local one-attempt permit and simulated adapter | Implemented |
 | Decision-time observation object | Development-only Sprint 1 implementation; not promoted into frozen P0 |
 | Deterministic message delivery, loss, partition, and stale-view layer | Development-only Sprint 1 implementation; no research outcomes generated |
-| Origin-store registry binding evidence to an endpoint principal and role | Development-only Sprint 2 implementation; verifier-to-destination-store authorisation remains prospective |
+| Origin-store registry binding evidence to an endpoint principal and role | Development-only Sprint 2 implementation |
 | Exact `SL`, `CR`, and fair-profile `PR` validators | Development-only Sprint 2 implementation; no research outcomes generated |
 | Common `ValidatedHandoff` interface for all three evidence formats | Development-only Sprint 2 implementation; representation-blind evidence policy only |
-| Same-policy gate for separate signed logs | Prospective; not implemented |
+| Verifier binding to authorised evidence store, permit store, and tools | Development-only Sprint 3 implementation verified in synthetic fixtures |
+| Representation-blind authority, chain, scope, action, replay, and permit gate | Development-only Sprint 3 implementation verified in synthetic fixtures |
+| Six-cell `SL`/`CR`/`PR` audit-and-gate harness | Published development-only Sprint 4 release over eight synthetic cases; not a study |
 | Frontier-model, multi-principal, or confirmatory experiment | Not run |
 
 ### 5.1 Party
@@ -103,11 +105,11 @@ Each proposal identifies the authority issuer, delegated subject, subject key, a
 
 “Current authority” always means current within the verifier's delivered local view and freshness policy. The protocol cannot prove that a newer revocation does not exist elsewhere.
 
-The planned observation may contain zero or more statuses. For one authority lineage—defined by issuer, subject, and subject key—versions are positive integers that increase monotonically. `status_id` is the content identifier of the complete status payload. A valid higher version supersedes every lower version whether its state is `ACTIVE` or `REVOKED`; an old receipt chain must be reissued against the higher version before it can proceed. Two different valid payloads at the same highest version are equivocation and cause `PAUSE`.
+The development observation may contain zero or more statuses. For one authority lineage—defined by issuer, subject, and subject key—versions are positive integers that increase monotonically. `status_id` is the content identifier of the complete status payload. A valid higher version supersedes every lower version whether its state is `ACTIVE` or `REVOKED`; an old handoff chain must be reissued against the higher version before it can proceed. Two different valid payloads at any one delivered version are equivocation and cause `PAUSE`.
 
-The verifier authenticates all statuses for the lineage delivered by the decision time, rejects statuses issued in the future or outside their freshness interval, and selects the unique highest valid version. It must pause if the status referenced by the chain is absent, the highest version is ambiguous, or a higher valid version makes the chain stale. If the controlling version is `REVOKED`, the verdict records revocation as well as the stale chain version. Statuses that arrive later cannot change the earlier verdict, but they remain available for post-event scoring.
+The verifier authenticates all statuses for the lineage delivered by the decision time. Two distinct authenticated statuses at any one delivered version cause `PAUSE`; otherwise the unique highest delivered version controls. The gate also pauses if that status is issued in the future, stale, revoked, not referenced by the chain, or newer than the chain's authority version. Statuses that arrive later cannot change the earlier verdict, but they remain available for post-event scoring.
 
-P0 does not implement this collection rule. It receives one status object and requires its version and identifier to match the chain.
+The Sprint 3 development gate applies this selection rule to the authenticated statuses in one decision-time local view and passed its synthetic integration checks. P0 does not implement the collection rule: it receives one status object and requires its version and identifier to match the chain.
 
 ### 5.5 Handoff proposal
 
@@ -144,7 +146,7 @@ The implementation accepts variable-length chains. The smallest worked example u
 
 ### 5.8 Decision-time observation
 
-The planned study adds an explicit observation object that does not yet exist in P0. It contains:
+Sprint 1 adds an explicit development-only observation object outside P0. It contains:
 
 - verifier identity and local evidence-store identity;
 - decision timestamp;
@@ -154,18 +156,18 @@ The planned study adds an explicit observation object that does not yet exist in
 - metadata and payload hashes for messages actually delivered by that timestamp; and
 - no scenario label, expected fault, future record, or oracle value.
 
-The local view never reveals missing-message identifiers, future deliveries, the global delivery schedule, or another principal's undelivered records. It declares both the evidence-store and permit-store identifiers and rejects a permit snapshot bearing a different store identifier. The formal study must additionally freeze a registry binding each verifier to its authorised stores; Sprint 1 does not infer ownership from identifier text. Every gate input must be derived from this observation. A test harness must not construct a separate complete chain for the gate.
+The local view never reveals missing-message identifiers, future deliveries, the global delivery schedule, or another principal's undelivered records. It declares both the evidence-store and permit-store identifiers and rejects a permit snapshot bearing a different store identifier. Sprint 3 adds a development verifier registry that binds each verifier to an evidence store, neutral permit store, and allowed tools. The formal study must freeze and review that registry rather than infer ownership from identifier text. Every gate input must be derived from the observation through the representation-specific validator. A test harness must not construct a separate complete chain for the gate.
 
 ### 5.9 Local permit
 
-A permit is bound to the leaf receipt, exact request hash, action nonce, tool, local replay scope, issue time, and expiry. Its local lifecycle is:
+A Sprint 3 development permit is bound to the leaf neutral handoff, neutral chain, controlling authority status, exact request hash, action nonce, tool, local replay scope, issue time, and expiry. This replaces P0's receipt-named permit field at the common-gate boundary without changing P0. Its local lifecycle is:
 
 ```text
 RESERVED -> ATTEMPTED -> SUCCEEDED
                       -> FAILED
 ```
 
-The adapter marks the permit `ATTEMPTED` before acting. A crash after that point requires reconciliation and is not retried automatically. This is one-attempt local gating, not globally exactly-once execution.
+Reservation compares the decision-time permit-store revision and records neutral interaction and sender-sequence observations atomically. A changed revision, conflicting observation, or duplicate replay key causes `PAUSE`. The adapter marks the permit `ATTEMPTED` before acting. A crash after that point requires reconciliation and is not retried automatically. This is one-attempt local gating, not globally exactly-once execution.
 
 ## 6. Protocol sequence
 
@@ -193,15 +195,15 @@ The gate returns `ALLOW` only if all applicable predicates succeed:
 7. The authority issuer, subject, key, and version remain consistent through the chain.
 8. Every child scope narrows the parent scope.
 9. The referenced signed status is present, and no higher delivered version for the same authority lineage makes the chain stale; the controlling status is active and fresh at decision time.
-10. Receipt and scope time bounds are valid at decision time.
+10. Handoff and scope time bounds are valid at decision time.
 11. The leaf request hash equals the exact action identifier.
 12. The action is permitted by every scope in the chain.
-13. No conflicting receipt or local replay has already been recorded in that permit store.
+13. No conflicting neutral handoff observation or local replay has already been recorded in that permit store.
 14. Local permit state is available and reservation succeeds.
 
 Any failed, missing, contradictory, stale, or unavailable requirement yields `PAUSE` with one or more machine-readable reasons. Unexpected verifier errors also yield `PAUSE`.
 
-The permit expires at the earlier of the configured permit lifetime and the earliest scope expiry. Consumption checks the permit, tool, request hash, nonce, state, and time again.
+The permit expires at the earliest of the configured permit lifetime, the earliest scope expiry, and the controlling status freshness bound. Consumption checks the permit, tool, request hash, nonce, state, and time again.
 
 ## 8. Fair receipt-by-gate experiment
 
@@ -220,7 +222,7 @@ One inferential episode is assigned to one cell. The four cells use the same epi
 
 For the primary H1 comparison between the two audit-only cells, agents receive the same neutral handoff API and acknowledgements. Representation encoding, retention, and audit delivery occur below that API and are not revealed to the agents. There is no gate in either cell. The implementation must test and record this masking boundary. If representation-specific information reaches an agent, that is a protocol deviation; the affected result cannot be described as a pure representation-and-retention effect.
 
-Development-only replay fixtures may encode one fixed neutral trace in all four cells to test conformance. Those paired encodings are not independent trials and do not enter effect estimates.
+The Sprint 4 development replay may encode one fixed neutral trace in all six primary and required-control cells to test conformance. Those branch executions are not independent trials and do not enter effect estimates.
 
 Each handoff begins with the same neutral semantic fields:
 
@@ -284,21 +286,21 @@ The core complete-evidence comparison uses a pre-treatment neutral delivery stra
 For the core representation comparison:
 
 - all three required formats are normalised to a common `ValidatedHandoff` interface that retains the verified record and message identifiers, signature-binding relation, configured source-store provenance, and how the parent was established; raw signatures remain in the source observation;
-- both gate-on cells use the same policy, permit-store semantics, adapter, time-to-live, and verdict categories.
+- all gate-on cells use the same policy, permit-store semantics, adapter, time-to-live, and verdict categories.
 
 The development-only common interface contains the neutral handoff, authenticated sender/receiver flags, bilateral-agreement result, receiver decision, parent-relation result, configured delivered-holder set, source-record and message identifiers, source-delivery provenance, stable validation reasons, and representation-specific binding facts. `bilateral_agreement` is true for signed logs only when two valid endpoint records contain the same neutral handoff and the receiver record accepts it; for a receipt it is true only when the nested attestations validate and the receiver accepts. A rejected but fully authenticated handoff remains available for audit with `bilateral_agreement=false`. Partial, conflicting, or parent-unresolved candidates remain validation issues and are not emitted as policy-eligible handoffs. The shared evidence policy consumes the representation-blind `policy_view()`, not a CrossTrace-only flag or the binding metadata. The observation's origin store is a trusted simulator declaration checked against the configured store registry, not a cryptographically authenticated network identity. The transport envelope cannot determine whether an innocently named payload field semantically reveals the evaluator's ground truth, so only allow-listed representation schemas may feed these validators.
 
 The development implementation adds a non-serialised process-local tag to validator-issued handoffs and policy views. A JSON-decoded normalised object is an audit record and must be revalidated from its source observation before policy use. This prevents accidental treatment of caller-authored all-true fields as validator output; it is not a portable signature or production trust mechanism.
 
-Normalisation must not erase the difference being tested. The implemented evidence-admission policy checks authenticated bilateral agreement and a valid parent relation. The planned full gate additionally requires scope compliance and current authority; representation-specific validators determine whether their delivered records establish the evidence predicates. Their schemas and mapping rules must be frozen before outcome data.
+Normalisation must not erase the difference being tested. The implemented evidence-admission policy checks authenticated bilateral agreement and a valid parent relation. The Sprint 3 development gate consumes only the representation-blind policy projection and additionally checks chain shape, party continuity, scope attenuation, the exact action, current delivered authority, neutral replay state, and permit-store revision. Representation-specific validators still determine whether their delivered records establish the evidence predicates. This is an engineering implementation boundary, not a result; the schemas, registry, reason codes, and mapping rules must be reviewed and frozen before outcome data.
 
 ### 8.2 Gate-off rule
 
-In `SL-AUDIT` and `PR-AUDIT`, every presented action is submitted to the simulated adapter without a CrossTrace gate. The adapter may still fail for an operational reason. Offline detection or later reconstruction does not count as prevention.
+In `SL-AUDIT`, `CR-AUDIT`, and `PR-AUDIT`, every presented action is submitted to the simulated adapter without a CrossTrace gate. The adapter may still fail for an operational reason. Offline detection or later reconstruction does not count as prevention.
 
 ### 8.3 Gate-on rule
 
-In `SL-GATE` and `PR-GATE`, the validator and policy engine receive only the decision-time local observation. A scenario label, complete source chain, future joined view, and oracle label are prohibited inputs.
+In `SL-GATE`, `CR-GATE`, and `PR-GATE`, the validator and policy engine receive only the decision-time local observation. A scenario label, complete source chain, future joined view, and oracle label are prohibited inputs.
 
 ### 8.4 Required competent-baseline control
 
@@ -307,6 +309,14 @@ A stronger cross-referenced-log control is required. In that control, the receiv
 ### 8.5 Optional diagnostic controls
 
 Ordinary local logs, a central append-only log, checkpoint variants, and an always-pause control may be included as secondary reference conditions. They are removed before the required cross-referenced-log control if the approved cap is tight.
+
+### 8.6 Development-only six-cell harness
+
+Sprint 4 fixes eight hand-written synthetic cases: complete evidence; one locally withheld leaf-receiver channel; both locally withheld leaf channels; a status delayed past the gate decision but available at the audit cutoff; a higher delivered revocation; an out-of-scope action; a replay attempt; and an authenticated conflicting leaf. The harness encodes each case into `SL`, `CR`, and `PR` and runs it in audit-only and gate modes, for 48 deterministic branch executions.
+
+One neutral trace and holder-to-store slot manifest are assigned before representation encoding. The audit and gate branch for one representation reuse the same encoded evidence bundle. Audit-only branches do not call the gate or reserve a permit. Gate inputs contain no case label, expected result, oracle value, future delivery, global schedule, or representation-specific binding metadata.
+
+The harness records parser and validator branches, delivered-record counts and bytes, chain state, gate reasons, permit transitions, and adapter state. These are engineering conformance fields, not estimands. The cases are not independent trials, calibration data, held-out material, evidence of superiority or equivalence, or a safety result. A reviewer release is admissible only after deterministic regeneration, schema checks, the integrated test suite, and the frozen P0 verifier pass.
 
 ## 9. Delivery and local-view model
 
@@ -373,6 +383,10 @@ Two isolated verifiers can each receive a locally valid-looking branch and both 
 
 P0 checks deterministic encoding, signature validation, local gating, and known fork behaviour with complete supplied evidence. It is not part of any confirmatory sample.
 
+### Development-only pre-award layers
+
+Sprint 1 supplies deterministic delivery and bounded local observations; Sprint 2 supplies the exact `SL`, `CR`, and `PR` validators and neutral policy view; Sprint 3 supplies the common gate and neutral permit state; and Sprint 4 supplies the published six-cell integration harness. These layers do not alter the P0 baseline. Their integrated checks and deterministic release verifier passed, and their synthetic executions are permanently excluded from calibration and confirmation.
+
 ### Proposed Phase I
 
 Phase I is the procurement-and-settlement mechanism study described in the Schmidt/joint-call application. It introduces independent trust domains, the delivery model, the corrected factorial, an excluded calibration pilot, frontier-model agents, held-out confirmation, and an external evaluator who reruns the frozen primary analysis and a representative scenario subset under a written acceptance test. Those activities begin only after an award and formal protocol registration.
@@ -392,4 +406,4 @@ This draft is ready for formal methods review only when:
 - the held-out policy is documented before held-out material exists; and
 - an external reviewer has had the opportunity to identify identification, missing-data, and inference failures.
 
-Until then, this remains a prospective pre-award design snapshot and must not be described as preregistered.
+The immediate next step is external methods review, followed by resolution of review comments and a frozen preregistration under the applicable award and approvals. Until then, this remains a prospective pre-award design snapshot and must not be described as preregistered. No further pre-award model, calibration, or held-out run is authorised.
