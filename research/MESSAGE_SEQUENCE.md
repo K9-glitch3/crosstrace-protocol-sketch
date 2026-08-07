@@ -142,12 +142,14 @@ Possible local result: `ALLOW` under the declared freshness rule. When version 8
 
 This case is essential. CrossTrace cannot act on evidence it has not received. The research question is whether its evidence and delivery rules produce a useful safety-availability trade-off, not whether signatures make partial observability disappear.
 
-## How the four experimental cells treat the same scenario family
+## How the primary and required diagnostic cells treat the same scenario family
 
 | Cell | Evidence retained | What happens at the action boundary |
 |---|---|---|
 | `SL-AUDIT` | Sender and receiver keep separate signed records | The presented action is submitted to the adapter without a gate; evidence is examined later. |
 | `SL-GATE` | The same separate signed records | The same-policy local gate decides from the delivered signed-log view. |
+| `CR-AUDIT` | The receiver's separate record binds the complete sender record identifier | The presented action is submitted to the adapter without a gate; evidence is examined later. |
+| `CR-GATE` | The same cross-referenced endpoint records | The same-policy local gate decides from the delivered cross-referenced view. |
 | `PR-AUDIT` | Sender and receiver keep the dual-attested receipt | The presented action is submitted to the adapter without a gate; evidence is examined later. |
 | `PR-GATE` | The same dual-attested receipt | The local gate decides from the delivered receipt view. |
 

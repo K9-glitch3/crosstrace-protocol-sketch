@@ -1,0 +1,136 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/crosstrace-sketch/neutral-handoff.schema.json",
+  "title": "CrossTrace neutral handoff",
+  "description": "Representation-neutral handoff facts used by the prospective SL, CR, and PR encoders. This schema is structural; executable codecs enforce canonical ordering and local field relations. Parent-to-child scope narrowing belongs to the later common gate and is not enforced by this schema.",
+  "$ref": "#/$defs/neutralHandoff",
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "timestamp": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+    },
+    "party": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["principal_id", "agent_id", "key_id"],
+      "properties": {
+        "principal_id": { "$ref": "#/$defs/identifier" },
+        "agent_id": { "$ref": "#/$defs/identifier" },
+        "key_id": { "$ref": "#/$defs/identifier" }
+      }
+    },
+    "paymentV1Scope": {
+      "type": "object",
+      "description": "The fixed payment-v1 scope. Array ordering is canonicalised and checked by the executable codec.",
+      "additionalProperties": false,
+      "required": [
+        "operations",
+        "resources",
+        "currency",
+        "max_amount_minor",
+        "not_before",
+        "not_after",
+        "redelegations_remaining"
+      ],
+      "properties": {
+        "operations": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/identifier" }
+        },
+        "resources": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/identifier" }
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "max_amount_minor": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "not_before": { "$ref": "#/$defs/timestamp" },
+        "not_after": { "$ref": "#/$defs/timestamp" },
+        "redelegations_remaining": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 32
+        }
+      }
+    },
+    "authorityLineage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "issuer_principal_id",
+        "subject_principal_id",
+        "subject_key_id"
+      ],
+      "properties": {
+        "issuer_principal_id": { "$ref": "#/$defs/identifier" },
+        "subject_principal_id": { "$ref": "#/$defs/identifier" },
+        "subject_key_id": { "$ref": "#/$defs/identifier" }
+      }
+    },
+    "neutralHandoff": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "interaction_id",
+        "sender",
+        "receiver",
+        "event_type",
+        "sender_sequence",
+        "previous_interaction_id",
+        "scope",
+        "authority_lineage",
+        "authority_version",
+        "referenced_status_id",
+        "created_at",
+        "request_hash"
+      ],
+      "properties": {
+        "interaction_id": { "$ref": "#/$defs/identifier" },
+        "sender": { "$ref": "#/$defs/party" },
+        "receiver": { "$ref": "#/$defs/party" },
+        "event_type": { "enum": ["delegation", "action_intent"] },
+        "sender_sequence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "previous_interaction_id": {
+          "oneOf": [
+            { "type": "null" },
+            { "$ref": "#/$defs/identifier" }
+          ]
+        },
+        "scope": { "$ref": "#/$defs/paymentV1Scope" },
+        "authority_lineage": { "$ref": "#/$defs/authorityLineage" },
+        "authority_version": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "referenced_status_id": { "$ref": "#/$defs/sha256" },
+        "created_at": { "$ref": "#/$defs/timestamp" },
+        "request_hash": { "$ref": "#/$defs/sha256" }
+      }
+    }
+  }
+}

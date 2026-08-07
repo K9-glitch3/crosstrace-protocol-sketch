@@ -15,4 +15,6 @@ The detailed local-worktree baseline, submission reconciliation, and pre-award a
 
 The development-only [Sprint 1 delivery package](../preaward/crosstrace_sprint1/README.md) now implements the deterministic decision-time observation and evidence-delivery interface without changing the frozen P0 source tree. Its fixtures are engineering tests, not research observations.
 
-The next implementation step is the exact separate-log and cross-referenced-log schemas, followed by representation-specific validators and the common `ValidatedHandoff` interface. Frontier-model and held-out material remain out of scope.
+The development-only [Sprint 2 evidence package](../preaward/crosstrace_sprint2/README.md) now fixes the exact separate-log, cross-referenced-log, and receipt mappings, their representation-specific validators, and the common `ValidatedHandoff` interface. It also supplies adversarial conformance fixtures; it does not contain research outcomes.
+
+The next implementation step is a new versioned common gate boundary: authority-status selection, scope/action checks, and permit replay identity must consume the neutral handoff rather than P0's receipt-specific permit field. Frontier-model, calibration, and held-out material remain out of scope until protocol review and registration.

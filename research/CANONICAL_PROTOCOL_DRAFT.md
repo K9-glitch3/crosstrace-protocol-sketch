@@ -64,8 +64,9 @@ CrossTrace is evaluated at one instrumented action boundary. It does not stop an
 | Local one-attempt permit and simulated adapter | Implemented |
 | Decision-time observation object | Development-only Sprint 1 implementation; not promoted into frozen P0 |
 | Deterministic message delivery, loss, partition, and stale-view layer | Development-only Sprint 1 implementation; no research outcomes generated |
-| Registry binding each verifier to authorised evidence and permit stores | Prospective; Sprint 1 declares and cross-checks store identifiers only |
-| Common `ValidatedHandoff` interface for both evidence formats | Prospective; not implemented |
+| Origin-store registry binding evidence to an endpoint principal and role | Development-only Sprint 2 implementation; verifier-to-destination-store authorisation remains prospective |
+| Exact `SL`, `CR`, and fair-profile `PR` validators | Development-only Sprint 2 implementation; no research outcomes generated |
+| Common `ValidatedHandoff` interface for all three evidence formats | Development-only Sprint 2 implementation; representation-blind evidence policy only |
 | Same-policy gate for separate signed logs | Prospective; not implemented |
 | Frontier-model, multi-principal, or confirmatory experiment | Not run |
 
@@ -174,7 +175,7 @@ The adapter marks the permit `ATTEMPTED` before acting. A crash after that point
 4. Both endpoints retain the completed receipt.
 5. A later sender creates a narrower proposal that names the completed parent receipt.
 6. At an action boundary, the delivery simulator constructs the verifier's local view using only messages delivered by the decision time.
-7. The representation-specific validator authenticates and normalises the delivered evidence.
+7. The representation-specific validator verifies the delivered record signatures and normalises the evidence under the declared simulator store mapping.
 8. If the gate is enabled, the common policy engine applies the decision rule below. If the gate is disabled, the presented action proceeds and the evidence is retained for audit only.
 9. An allowed permit is consumed once by the local adapter. A paused action is not executed at that boundary.
 10. Evidence delivered after the decision may support later diagnosis, but cannot be counted as prevention.
@@ -239,14 +240,16 @@ The two evidence representations encode those fields differently.
 
 Neither endpoint signature binds the other endpoint's complete signed record. The parent reference names the earlier semantic handoff, not a completed bilateral object. A verifier needs matching valid sender and receiver records to establish bilateral agreement.
 
-The prospective signed-log bodies are fixed as:
+The development-only Sprint 2 signed-log body is fixed as:
 
 ```text
 SignedEndpointRecordBody = {
+    record_version: "crosstrace-evidence/0.1",
     record_type: "signed_endpoint_record",
     holder: Party,
     role: "SENDER" | "RECEIVER",
     handoff: NeutralHandoff,
+    sender_record_id: null | sha256,
     decision: null | "ACCEPT" | "REJECT",
     reason_code: null | string,
     decided_at: null | timestamp
@@ -268,9 +271,9 @@ NeutralHandoff = {
 }
 ```
 
-The sender form requires `role=SENDER` and null decision fields. The receiver form requires `role=RECEIVER`, a decision, and decision time. Each signature covers a domain separator plus its own complete canonical body. The receiver form does not contain or sign the sender record identifier, sender signature, or sender record bytes.
+The sender form requires `role=SENDER` and null decision and cross-reference fields. An `SL` receiver also has a null `sender_record_id`; a `CR` receiver requires the content identifier of the complete signed sender record. Every body has a derived `body_id`. The endpoint signature covers a fixed domain and the canonical `{algorithm, key_id, body_id}` attestation body, and the final `record_id` covers the body, body identifier, and attestation including its signature. An `SL` receiver therefore does not bind the sender record, while a `CR` receiver binds that exact signed record identifier. The same sender record bytes are valid in both representations.
 
-The neutral generator assigns each semantic handoff an `interaction_id` and, where applicable, a `previous_interaction_id`. The separate-log representation signs those identifiers directly. The receipt representation keeps the same `interaction_id` but replaces the semantic parent reference with `previous_receipt_id`, the content identifier of the completed encoded parent. After receipt verification, the normaliser maps that parent receipt back to its proposal's `interaction_id`. This mapping is the exact parent-binding difference under study.
+The neutral generator assigns each semantic handoff an `interaction_id` and, where applicable, a `previous_interaction_id`. The separate-log representation signs those identifiers directly. In the fair P0-receipt mapping, `scope_profile` is fixed to `payment-v1`, the otherwise redundant P0 `nonce` equals `interaction_id`, and the authority fields map one-for-one into the neutral lineage, version, and referenced status. The receipt representation keeps the same `interaction_id` but replaces the semantic parent reference with `previous_receipt_id`, the content identifier of the completed encoded parent. After receipt verification, the normaliser maps an exact delivered and validated parent receipt back to its proposal's `interaction_id`. If that receipt is absent, the child remains unresolved; the implementation neither consults global evidence nor converts it into a root. This mapping is the exact parent-binding difference under study.
 
 **Dual-attested receipts** produce one proposal signed by the sender, followed by a receiver signature that binds the same proposal hash, the complete sender attestation, the receiver decision, and decision time. A child names the content identifier of the completed parent receipt. Each endpoint retains an identical complete receipt, so either intact retained copy contains both attestations.
 
@@ -280,12 +283,14 @@ The core complete-evidence comparison uses a pre-treatment neutral delivery stra
 
 For the core representation comparison:
 
-- both formats are normalised to a common `ValidatedHandoff` interface that retains validation provenance, including which records arrived, which signatures bind which bytes, and how the parent was established;
+- all three required formats are normalised to a common `ValidatedHandoff` interface that retains the verified record and message identifiers, signature-binding relation, configured source-store provenance, and how the parent was established; raw signatures remain in the source observation;
 - both gate-on cells use the same policy, permit-store semantics, adapter, time-to-live, and verdict categories.
 
-The prospective common interface contains the neutral handoff, authenticated sender/receiver flags, bilateral-agreement result, receiver decision, parent-relation result, delivered-holder set, source-record identifiers, and representation-specific binding facts. `bilateral_agreement` is true for signed logs only when two valid endpoint records contain the same neutral handoff and the receiver record accepts it; for a receipt it is true only when the nested attestations validate. The shared policy consumes `bilateral_agreement`, not a CrossTrace-only flag. The transport envelope cannot determine whether an innocently named payload field semantically reveals the evaluator's ground truth, so only allow-listed representation schemas may feed these validators.
+The development-only common interface contains the neutral handoff, authenticated sender/receiver flags, bilateral-agreement result, receiver decision, parent-relation result, configured delivered-holder set, source-record and message identifiers, source-delivery provenance, stable validation reasons, and representation-specific binding facts. `bilateral_agreement` is true for signed logs only when two valid endpoint records contain the same neutral handoff and the receiver record accepts it; for a receipt it is true only when the nested attestations validate and the receiver accepts. A rejected but fully authenticated handoff remains available for audit with `bilateral_agreement=false`. Partial, conflicting, or parent-unresolved candidates remain validation issues and are not emitted as policy-eligible handoffs. The shared evidence policy consumes the representation-blind `policy_view()`, not a CrossTrace-only flag or the binding metadata. The observation's origin store is a trusted simulator declaration checked against the configured store registry, not a cryptographically authenticated network identity. The transport envelope cannot determine whether an innocently named payload field semantically reveals the evaluator's ground truth, so only allow-listed representation schemas may feed these validators.
 
-Normalisation must not erase the difference being tested. The shared policy requires authenticated bilateral agreement, a valid parent relation, scope compliance, and current authority; representation-specific validators determine whether their delivered records establish those predicates. Their schemas and mapping rules must be frozen before outcome data.
+The development implementation adds a non-serialised process-local tag to validator-issued handoffs and policy views. A JSON-decoded normalised object is an audit record and must be revalidated from its source observation before policy use. This prevents accidental treatment of caller-authored all-true fields as validator output; it is not a portable signature or production trust mechanism.
+
+Normalisation must not erase the difference being tested. The implemented evidence-admission policy checks authenticated bilateral agreement and a valid parent relation. The planned full gate additionally requires scope compliance and current authority; representation-specific validators determine whether their delivered records establish the evidence predicates. Their schemas and mapping rules must be frozen before outcome data.
 
 ### 8.2 Gate-off rule
 
@@ -305,7 +310,7 @@ Ordinary local logs, a central append-only log, checkpoint variants, and an alwa
 
 ## 9. Delivery and local-view model
 
-The planned deterministic delivery layer represents each evidence message with an origin, destination, send time, scheduled delivery time, payload hash, and delivery state. It supports:
+The development-only Sprint 1 deterministic delivery layer represents each evidence message with an origin, destination, send time, scheduled delivery time, payload hash, and delivery state. It supports:
 
 - bounded delay;
 - loss or withholding;

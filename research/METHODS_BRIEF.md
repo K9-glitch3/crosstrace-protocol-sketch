@@ -55,6 +55,8 @@ For the primary audit-only representation comparison, agents see the same neutra
 
 The development-only Sprint 1 package implements a deterministic delivery layer. Before representation encoding, the manifest assigns each holder-to-store transmission a neutral delivery slot. Transport draws are derived from that slot, copy index, draw purpose, and seed, so changing payload bytes or representation does not change the assigned loss, duplication, or delay. Each retained copy or status is a separate message that may be delayed, lost, duplicated, reordered, or partitioned. At time `t`, a verifier sees only messages delivered by `t`; it never sees missing-message identifiers, future deliveries, another principal's private view, or the evaluator's schedule. For reconstruction, the evaluator uses a separate condition-neutral inbox containing only holder messages delivered through the same frozen delivery model by the preregistered audit cutoff. Exact representation validators, not the generic transport envelope, are responsible for excluding semantic oracle data from payloads.
 
+The development-only Sprint 2 package implements those exact `SL`, cross-referenced `CR`, and fair-profile `PR` validators plus a common representation-blind policy projection. Missing or conflicting evidence remains a validation issue rather than being silently completed or selected. These conformance fixtures are not outcome data, and the full common authority, scope, action, replay, and permit gate remains prospective.
+
 The study will report two reconstruction effects:
 
 - a complete-evidence comparison, which isolates signature and parent-binding structure; and
@@ -123,6 +125,6 @@ Before any frontier-model run, the project will implement and test with developm
 5. separate action-state and cost instrumentation; and
 6. a frozen reconstruction procedure and held-out policy.
 
-As of 7 August 2026, item 2 has a development-only implementation and invariant test suite outside the frozen P0 source tree. It has generated no model-study observations and is not evidence of a safety effect.
+As of 7 August 2026, items 1–3 have development-only implementations and adversarial conformance tests outside the frozen P0 source tree. The common interface currently stops at evidence admission; items 4–6 remain prospective. This work has generated no model-study observations and is not evidence of a safety effect.
 
 Frontier-model experiments, confirmatory episodes, held-out cases, paid replication, and Phase II work remain frozen until the relevant funding and protocol approvals exist.

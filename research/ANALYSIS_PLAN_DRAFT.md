@@ -368,6 +368,8 @@ Use hand-written toy fixtures to test schemas, delivery semantics, gates, metric
 
 On 7 August 2026, the deterministic delivery and local-observation portion entered this stage in the separate `preaward/crosstrace_sprint1` package. This records implementation status only; its fixtures are not study observations.
 
+On the same date, the separate `preaward/crosstrace_sprint2` package fixed the exact `SL` and `CR` schemas, the fair-profile `PR` mapping and validator over the existing P0 receipt schema, representation-specific validators, and common `ValidatedHandoff` evidence interface. Its adversarial fixtures are also permanently excluded from calibration and confirmation. Authority selection, full same-policy gating, outcome generation, and inference remain outside that package.
+
 ### Stage 2: excluded calibration pilot
 
 Only after funding and protocol review, run the approved number of frontier-agent calibration episodes to estimate scenario difficulty, scorer agreement, costs, and nuisance parameters. The Schmidt submission and the internal LTFF full-tier plan use approximately 120 as a planning figure; the signed agreement and final power plan control. Treatment-effect results from this pilot are not confirmatory results.
