@@ -271,7 +271,7 @@ E_path_binding = p_w(exact_path | PR-AUDIT, complete evidence)
 
 It isolates signature and parent-binding structure. It may have a ceiling if both representations contain an unambiguous complete path; that is a valid result.
 
-The end-to-end representation-and-retention estimand applies the same holder-level delivery faults to each representation and uses whatever reached the fixed audit view:
+The end-to-end representation-and-retention estimand applies the same holder-level delivery faults to each representation and uses whatever reached the fixed audit view. Those faults are keyed by a pre-treatment neutral delivery slot, not by representation-specific payload bytes or message identifiers:
 
 ```text
 E_path_system = p_w(exact_path | PR-AUDIT, mapped holder delivery)
@@ -365,6 +365,8 @@ The P0 artifact at commit `824078b...` remains frozen feasibility evidence. It c
 ### Stage 1: development-only engineering
 
 Use hand-written toy fixtures to test schemas, delivery semantics, gates, metrics, manifests, and failure handling. Development fixtures are permanently excluded from calibration and confirmation.
+
+On 7 August 2026, the deterministic delivery and local-observation portion entered this stage in the separate `preaward/crosstrace_sprint1` package. This records implementation status only; its fixtures are not study observations.
 
 ### Stage 2: excluded calibration pilot
 

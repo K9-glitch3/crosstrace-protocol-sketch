@@ -13,4 +13,6 @@ Read them in this order:
 
 The detailed local-worktree baseline, submission reconciliation, and pre-award accounting ledger are internal compliance records. They are maintained outside this public research directory and must not be published with the methods pack.
 
-The next implementation step is the deterministic decision-time observation and evidence-delivery interface. It must be built against these documents using development-only fixtures; it must not consume frontier-model or held-out material.
+The development-only [Sprint 1 delivery package](../preaward/crosstrace_sprint1/README.md) now implements the deterministic decision-time observation and evidence-delivery interface without changing the frozen P0 source tree. Its fixtures are engineering tests, not research observations.
+
+The next implementation step is the exact separate-log and cross-referenced-log schemas, followed by representation-specific validators and the common `ValidatedHandoff` interface. Frontier-model and held-out material remain out of scope.

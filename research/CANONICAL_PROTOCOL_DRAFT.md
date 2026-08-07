@@ -62,10 +62,11 @@ CrossTrace is evaluated at one instrumented action boundary. It does not stop an
 | Signed authority status and local key roles | Implemented |
 | Selection among multiple delivered authority statuses | Prospective; P0 accepts one supplied status |
 | Local one-attempt permit and simulated adapter | Implemented |
-| Decision-time observation object | Prospective; not implemented |
-| Deterministic message delivery, loss, partition, and stale-view layer | Prospective; not implemented |
+| Decision-time observation object | Development-only Sprint 1 implementation; not promoted into frozen P0 |
+| Deterministic message delivery, loss, partition, and stale-view layer | Development-only Sprint 1 implementation; no research outcomes generated |
+| Registry binding each verifier to authorised evidence and permit stores | Prospective; Sprint 1 declares and cross-checks store identifiers only |
 | Common `ValidatedHandoff` interface for both evidence formats | Prospective; not implemented |
-| Equivalent gate for separate signed logs | Prospective; not implemented |
+| Same-policy gate for separate signed logs | Prospective; not implemented |
 | Frontier-model, multi-principal, or confirmatory experiment | Not run |
 
 ### 5.1 Party
@@ -152,7 +153,7 @@ The planned study adds an explicit observation object that does not yet exist in
 - metadata and payload hashes for messages actually delivered by that timestamp; and
 - no scenario label, expected fault, future record, or oracle value.
 
-The local view never reveals missing-message identifiers, future deliveries, the global delivery schedule, or another principal's undelivered records. Every gate input must be derived from this observation. A test harness must not construct a separate complete chain for the gate.
+The local view never reveals missing-message identifiers, future deliveries, the global delivery schedule, or another principal's undelivered records. It declares both the evidence-store and permit-store identifiers and rejects a permit snapshot bearing a different store identifier. The formal study must additionally freeze a registry binding each verifier to its authorised stores; Sprint 1 does not infer ownership from identifier text. Every gate input must be derived from this observation. A test harness must not construct a separate complete chain for the gate.
 
 ### 5.9 Local permit
 
@@ -273,7 +274,7 @@ The neutral generator assigns each semantic handoff an `interaction_id` and, whe
 
 **Dual-attested receipts** produce one proposal signed by the sender, followed by a receiver signature that binds the same proposal hash, the complete sender attestation, the receiver decision, and decision time. A child names the content identifier of the completed parent receipt. Each endpoint retains an identical complete receipt, so either intact retained copy contains both attestations.
 
-For delivery, each endpoint may forward or serve its retained record to the action verifier. Separate-log messages carry different endpoint records. Receipt messages from the two endpoints may carry identical complete receipt copies. Each copy is scheduled, delayed, lost, duplicated, or delivered independently.
+For delivery, each endpoint may forward or serve its retained record to the action verifier. Separate-log messages carry different endpoint records. Receipt messages from the two endpoints may carry identical complete receipt copies. Each copy is scheduled, delayed, lost, duplicated, or delivered independently. The pre-treatment manifest assigns a representation-neutral `delivery_slot_id` to each holder-to-store copy. The transport draw uses that slot, the copy index, the draw purpose, and the seed; it does not use the representation-specific message identifier or payload bytes. Reusing a slot across representations is mandatory, and changing its route or send time after assignment is a protocol deviation.
 
 The core complete-evidence comparison uses a pre-treatment neutral delivery stratum: both endpoint-to-audit channels and the required authority-status channel are reachable by the cutoff, and no transport-corruption fault is assigned. Eligibility is fixed before representation assignment. The assigned representation is then encoded and scored; eligibility does not require the unassigned representation to validate. A separate delivery-stress analysis applies the same frozen holder-level reachability mapping to each assigned representation and measures the resulting availability difference.
 
@@ -282,7 +283,7 @@ For the core representation comparison:
 - both formats are normalised to a common `ValidatedHandoff` interface that retains validation provenance, including which records arrived, which signatures bind which bytes, and how the parent was established;
 - both gate-on cells use the same policy, permit-store semantics, adapter, time-to-live, and verdict categories.
 
-The prospective common interface contains the neutral handoff, authenticated sender/receiver flags, bilateral-agreement result, receiver decision, parent-relation result, delivered-holder set, source-record identifiers, and representation-specific binding facts. `bilateral_agreement` is true for signed logs only when two valid endpoint records contain the same neutral handoff and the receiver record accepts it; for a receipt it is true only when the nested attestations validate. The shared policy consumes `bilateral_agreement`, not a CrossTrace-only flag.
+The prospective common interface contains the neutral handoff, authenticated sender/receiver flags, bilateral-agreement result, receiver decision, parent-relation result, delivered-holder set, source-record identifiers, and representation-specific binding facts. `bilateral_agreement` is true for signed logs only when two valid endpoint records contain the same neutral handoff and the receiver record accepts it; for a receipt it is true only when the nested attestations validate. The shared policy consumes `bilateral_agreement`, not a CrossTrace-only flag. The transport envelope cannot determine whether an innocently named payload field semantically reveals the evaluator's ground truth, so only allow-listed representation schemas may feed these validators.
 
 Normalisation must not erase the difference being tested. The shared policy requires authenticated bilateral agreement, a valid parent relation, scope compliance, and current authority; representation-specific validators determine whether their delivered records establish those predicates. Their schemas and mapping rules must be frozen before outcome data.
 

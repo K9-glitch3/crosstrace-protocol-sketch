@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/K9-glitch3/crosstrace-protocol-sketch/schema/evidence-message.schema.json",
+  "title": "CrossTrace Sprint 1 evidence message",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "message_id",
+    "delivery_slot_id",
+    "origin_store_id",
+    "destination_store_id",
+    "sent_at",
+    "payload_kind",
+    "payload_hash",
+    "payload_b64",
+    "payload_size_bytes"
+  ],
+  "properties": {
+    "version": { "const": "crosstrace-delivery/0.1" },
+    "message_id": { "$ref": "#/$defs/hash" },
+    "delivery_slot_id": { "$ref": "#/$defs/identifier" },
+    "origin_store_id": { "$ref": "#/$defs/identifier" },
+    "destination_store_id": { "$ref": "#/$defs/identifier" },
+    "sent_at": { "$ref": "#/$defs/timestamp" },
+    "payload_kind": {
+      "enum": [
+        "AUTHORITY_STATUS",
+        "RECEIPT",
+        "SIGNED_ENDPOINT_RECORD",
+        "CROSS_REFERENCED_RECORD",
+        "PROTOCOL_SIGNAL"
+      ]
+    },
+    "payload_hash": { "$ref": "#/$defs/hash" },
+    "payload_b64": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]+$"
+    },
+    "payload_size_bytes": {
+      "type": "integer",
+      "minimum": 2
+    }
+  },
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+    },
+    "hash": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "timestamp": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+    }
+  }
+}
